@@ -1,0 +1,19 @@
+# Environment variables / secrets
+**/.env
+*.env
+
+# Python virtual environments & bytecode
+**/.venv/
+**/__pycache__/
+*.pyc
+
+# Generated portfolio data
+data/latest_portfolio.csv
+
+# IDE configs
+.idea/
+.vscode/
+
+# Flutter build outputs
+frontend/build/
+frontend/.dart_tool/
