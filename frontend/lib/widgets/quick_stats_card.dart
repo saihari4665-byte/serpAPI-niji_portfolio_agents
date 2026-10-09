@@ -8,28 +8,10 @@ class QuickStatsCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final portfolioSummary = scanData['portfolio_summary'] ?? {};
-    final marketData = scanData['market_data'] ?? {};
-    
-    double totalInvested = portfolioSummary['total_value'] ?? 0.0;
-    
-    double currentValue = 0.0;
-    final holdings = portfolioSummary['holdings'] ?? {};
-    
-    holdings.forEach((ticker, data) {
-      final shares = data['shares'] ?? 0;
-      final mData = marketData[ticker]?['price'];
-      if (mData != null && mData['current_price'] != null) {
-        String priceStr = mData['current_price'].toString().replaceAll(',', '');
-        double price = double.tryParse(priceStr) ?? 0.0;
-        currentValue += shares * price;
-      } else {
-        currentValue += (data['avg_buy_price'] ?? 0.0) * shares;
-      }
-    });
-
-    double pnl = currentValue - totalInvested;
-    double pnlPct = totalInvested > 0 ? (pnl / totalInvested) * 100 : 0.0;
+    final totalInvested = (scanData['total_invested'] as num?)?.toDouble() ?? 0.0;
+    final currentValue = (scanData['current_value'] as num?)?.toDouble() ?? 0.0;
+    final pnl = (scanData['pnl'] as num?)?.toDouble() ?? 0.0;
+    final pnlPct = (scanData['pnl_percentage'] as num?)?.toDouble() ?? 0.0;
     
     final currency = NumberFormat.currency(locale: 'en_IN', symbol: '₹', decimalDigits: 2);
     final isPositive = pnl >= 0;

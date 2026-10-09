@@ -5,6 +5,21 @@ import 'package:http/http.dart' as http;
 class ApiService {
   static const String baseUrl = 'http://127.0.0.1:8000/api/portfolio';
 
+  Future<List<String>> checkPrivacy(Uint8List bytes, String filename) async {
+    var uri = Uri.parse('$baseUrl/privacy-check');
+    var request = http.MultipartRequest('POST', uri);
+    request.files.add(http.MultipartFile.fromBytes('file', bytes, filename: filename));
+    
+    var response = await request.send();
+    if (response.statusCode != 200) {
+      throw Exception('Failed to check privacy: ${response.statusCode}');
+    }
+    
+    final respStr = await response.stream.bytesToString();
+    var data = jsonDecode(respStr);
+    return List<String>.from(data['sanitized_queries'] ?? []);
+  }
+
   Future<Map<String, dynamic>> uploadPortfolio(Uint8List bytes, String filename) async {
     var uri = Uri.parse('$baseUrl/upload');
     var request = http.MultipartRequest('POST', uri);
@@ -29,14 +44,22 @@ class ApiService {
     return jsonDecode(response.body);
   }
 
-  Future<String> analyzePortfolio() async {
+  Future<Map<String, dynamic>> analyzePortfolio(String aiMode, String? geminiApiKey, {bool forceRefresh = false}) async {
     var uri = Uri.parse('$baseUrl/analyze');
-    var response = await http.post(uri);
+    var request = http.MultipartRequest('POST', uri);
     
+    if (geminiApiKey != null && geminiApiKey.isNotEmpty) {
+      request.fields['gemini_api_key'] = geminiApiKey;
+    }
+    request.fields['ai_mode'] = aiMode;
+    request.fields['force_refresh'] = forceRefresh.toString();
+    
+    var response = await request.send();
     if (response.statusCode != 200) {
       throw Exception('Failed to analyze portfolio: ${response.statusCode}');
     }
-    var data = jsonDecode(response.body);
-    return data['analysis'] ?? 'No analysis returned.';
+    
+    final respStr = await response.stream.bytesToString();
+    return jsonDecode(respStr);
   }
 }

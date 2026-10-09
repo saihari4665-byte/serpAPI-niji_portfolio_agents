@@ -2,13 +2,14 @@ import 'package:flutter/material.dart';
 
 class HealthScoreCard extends StatelessWidget {
   final int score;
-  final String label;
+  final String grade;
+  final String status;
 
-  const HealthScoreCard({super.key, required this.score, required this.label});
+  const HealthScoreCard({super.key, required this.score, required this.grade, required this.status});
 
   Color get scoreColor {
-    if (score >= 75) return const Color(0xFF22C55E); // Soft Green
-    if (score >= 50) return const Color(0xFFF59E0B); // Amber
+    if (score >= 85) return const Color(0xFF22C55E); // Soft Green
+    if (score >= 70) return const Color(0xFFF59E0B); // Amber
     return const Color(0xFFEF4444); // Soft Red
   }
 
@@ -36,7 +37,7 @@ class HealthScoreCard extends StatelessWidget {
                 width: 100,
                 height: 100,
                 child: CircularProgressIndicator(
-                  value: score / 100,
+                  value: score / 100.0,
                   strokeWidth: 8,
                   color: scoreColor,
                   backgroundColor: const Color(0xFF2A2A2A),
@@ -47,7 +48,7 @@ class HealthScoreCard extends StatelessWidget {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Text(
-                    "A",
+                    grade,
                     style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold, color: scoreColor),
                   ),
                 ],
@@ -56,7 +57,7 @@ class HealthScoreCard extends StatelessWidget {
           ),
           const SizedBox(height: 16),
           Text(
-            "$score / 100 • $label",
+            "$score / 100 • $status",
             style: const TextStyle(color: Color(0xFFF8F9FA), fontSize: 14, fontWeight: FontWeight.w500),
           ),
         ],

@@ -23,23 +23,27 @@ class _AssetAllocationChartState extends State<AssetAllocationChart> {
 
   @override
   Widget build(BuildContext context) {
-    final holdings = widget.scanData['portfolio_summary']?['holdings'] ?? {};
+    final sectorAllocation = widget.scanData['sector_allocation'] as List<dynamic>? ?? [];
     
     List<PieChartSectionData> sections = [];
     List<Widget> legendItems = [];
     
     int i = 0;
-    holdings.forEach((ticker, data) {
+    for (var data in sectorAllocation) {
+      final sector = data['sector'] as String? ?? 'Unknown';
+      final weight = (data['percentage'] as num?)?.toDouble() ?? 0.0;
       final color = colors[i % colors.length];
-      final weight = data['weight_percent'] ?? 0.0;
+      
       final isTouched = i == touchedIndex;
-      final radius = isTouched ? 65.0 : 60.0;
+      final radius = isTouched ? 70.0 : 60.0;
+      final title = isTouched ? '$sector\n${weight.toStringAsFixed(1)}%' : '';
       
       sections.add(
         PieChartSectionData(
           color: color,
-          value: weight,
-          title: '', // Hide default titles for cleaner look
+          value: weight.abs(),
+          title: title,
+          titleStyle: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Colors.white),
           radius: radius,
         )
       );
@@ -51,8 +55,10 @@ class _AssetAllocationChartState extends State<AssetAllocationChart> {
             children: [
               Container(width: 12, height: 12, decoration: BoxDecoration(color: color, shape: BoxShape.circle)),
               const SizedBox(width: 12),
-              Text(ticker, style: const TextStyle(color: Color(0xFFF8F9FA), fontWeight: FontWeight.w500, fontSize: 14)),
-              const Spacer(),
+              Expanded(
+                child: Text(sector, style: const TextStyle(color: Color(0xFFF8F9FA), fontWeight: FontWeight.w500, fontSize: 14), overflow: TextOverflow.ellipsis),
+              ),
+              const SizedBox(width: 8),
               Text('${weight.toStringAsFixed(1)}%', style: const TextStyle(color: Color(0xFFA1A1AA), fontSize: 14)),
             ],
           ),
@@ -60,7 +66,7 @@ class _AssetAllocationChartState extends State<AssetAllocationChart> {
       );
       
       i++;
-    });
+    }
 
     return Container(
       padding: const EdgeInsets.all(24),

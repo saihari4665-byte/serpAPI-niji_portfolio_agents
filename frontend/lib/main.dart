@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'screens/dashboard_screen.dart';
+import 'screens/main_shell.dart';
 
 void main() {
   runApp(const NijiPortfolioApp());
@@ -39,7 +39,7 @@ class NijiPortfolioApp extends StatelessWidget {
           elevation: 0,
         ),
       ),
-      home: const DashboardScreen(),
+      home: const MainShell(),
     );
   }
 }
