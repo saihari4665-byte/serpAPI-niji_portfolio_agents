@@ -44,13 +44,33 @@ class ApiService {
     return jsonDecode(response.body);
   }
 
-  Future<Map<String, dynamic>> analyzePortfolio(String aiMode, String? geminiApiKey, {bool forceRefresh = false}) async {
+  static const String settingsUrl = 'http://127.0.0.1:8000/api/settings/serpapi';
+
+  Future<Map<String, dynamic>> getSerpApiStatus() async {
+    var response = await http.get(Uri.parse('$settingsUrl/status'));
+    if (response.statusCode == 200) return jsonDecode(response.body);
+    throw Exception('Failed to get SerpApi status');
+  }
+
+  Future<Map<String, dynamic>> saveSerpApiKey(String apiKey) async {
+    var response = await http.post(
+      Uri.parse('$settingsUrl/save'),
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode({'api_key': apiKey}),
+    );
+    if (response.statusCode == 200) return jsonDecode(response.body);
+    final error = jsonDecode(response.body)['detail'] ?? 'Failed to connect';
+    throw Exception(error);
+  }
+
+  Future<void> clearSerpApiKey() async {
+    await http.post(Uri.parse('$settingsUrl/clear'));
+  }
+
+  Future<Map<String, dynamic>> analyzePortfolio(String aiMode, {bool forceRefresh = false}) async {
     var uri = Uri.parse('$baseUrl/analyze');
     var request = http.MultipartRequest('POST', uri);
     
-    if (geminiApiKey != null && geminiApiKey.isNotEmpty) {
-      request.fields['gemini_api_key'] = geminiApiKey;
-    }
     request.fields['ai_mode'] = aiMode;
     request.fields['force_refresh'] = forceRefresh.toString();
     

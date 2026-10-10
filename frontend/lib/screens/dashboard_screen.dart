@@ -3,26 +3,21 @@ import 'package:fl_chart/fl_chart.dart';
 
 class DashboardScreen extends StatefulWidget {
   final Map<String, dynamic>? scanData;
-  final Function(String?) onUploadPressed;
+  final VoidCallback onUploadPressed;
   final VoidCallback onViewReportPressed;
   final VoidCallback onRefreshPressed;
 
-  const DashboardScreen({super.key, required this.scanData, required this.onUploadPressed, required this.onViewReportPressed, required this.onRefreshPressed});
+  final bool isRegenerating; final VoidCallback? onRegenerate; const DashboardScreen({super.key, required this.scanData, required this.onUploadPressed, required this.onViewReportPressed, required this.onRefreshPressed, this.isRegenerating = false, this.onRegenerate});
 
   @override
   State<DashboardScreen> createState() => _DashboardScreenState();
 }
 
 class _DashboardScreenState extends State<DashboardScreen> {
-  final TextEditingController _apiKeyController = TextEditingController();
   bool _obscureKey = true;
   int _touchedIndex = -1;
 
-  @override
-  void dispose() {
-    _apiKeyController.dispose();
-    super.dispose();
-  }
+
 
   Widget _buildSectorTooltip(Map sectorData, List holdings, double totalValue) {
     String sectorName = sectorData['sector'];
@@ -112,30 +107,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
               const SizedBox(height: 32),
               
               // API KEY FIELD
-              const Align(alignment: Alignment.centerLeft, child: Text("Gemini API Key (Optional Cloud Fallback)", style: TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.w600))),
-              const SizedBox(height: 8),
-              TextField(
-                controller: _apiKeyController,
-                obscureText: _obscureKey,
-                style: const TextStyle(color: Colors.white),
-                decoration: InputDecoration(
-                  filled: true,
-                  fillColor: const Color(0xFF1E1E1E),
-                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: BorderSide.none),
-                  hintText: "AIzaSy...",
-                  hintStyle: const TextStyle(color: Color(0xFF404040)),
-                  suffixIcon: IconButton(
-                    icon: Icon(_obscureKey ? Icons.visibility_off : Icons.visibility, color: const Color(0xFFA1A1AA)),
-                    onPressed: () => setState(() => _obscureKey = !_obscureKey),
-                  )
-                ),
-              ),
-              const SizedBox(height: 8),
-              const Text("If you do not have a local Ollama instance running, paste your Gemini API key here to process the SerpApi data in the cloud.", style: TextStyle(color: Color(0xFFA1A1AA), fontSize: 12)),
-              const SizedBox(height: 32),
+              
               
               ElevatedButton.icon(
-                onPressed: () => widget.onUploadPressed(_apiKeyController.text.trim()),
+                onPressed: widget.onUploadPressed,
                 icon: const Icon(Icons.upload_file),
                 label: const Text("Import CSV File"),
                 style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF4F46E5), foregroundColor: Colors.white, padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16), textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
@@ -325,7 +300,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                         ],
                       ),
                       Expanded(
-                        child: (!hasAi || aiReport['is_ai'] != true) 
+                        child: (!hasAi) 
                           ? Column(
                               mainAxisAlignment: MainAxisAlignment.center,
                               crossAxisAlignment: CrossAxisAlignment.center,

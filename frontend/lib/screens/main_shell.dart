@@ -8,7 +8,7 @@ import 'portfolio_screen.dart';
 import 'privacy_gate_screen.dart';
 import 'reports_screen.dart';
 import 'evidence_screen.dart';
-import 'settings_screen.dart';
+import '../widgets/serpapi_config_widget.dart';
 
 class MainShell extends StatefulWidget {
   const MainShell({super.key});
@@ -20,9 +20,29 @@ class MainShell extends StatefulWidget {
 class _MainShellState extends State<MainShell> {
   final ApiService _apiService = ApiService();
   int _selectedIndex = 0;
-  bool _isAirGapped = true;
   Map<String, dynamic>? _scanData;
-  String? _savedGeminiKey;
+
+  bool _isRegeneratingReport = false;
+  
+  void _regenerateReport() async {
+    if (_isRegeneratingReport) return;
+    setState(() { _isRegeneratingReport = true; });
+    try {
+      
+      final newData = await _apiService.analyzePortfolio("local", forceRefresh: false);
+      if (mounted) {
+        setState(() {
+          _scanData = newData;
+          _isRegeneratingReport = false;
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() { _isRegeneratingReport = false; });
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Report generation failed: $e', style: TextStyle(color: Colors.white)), backgroundColor: const Color(0xFFEF4444)));
+      }
+    }
+  }
   
   final List<String> _breadcrumbs = [
     "Dashboard",
@@ -32,12 +52,7 @@ class _MainShellState extends State<MainShell> {
     "Evidence Explorer"
   ];
 
-  Future<void> _showImportModal([String? geminiApiKey]) async {
-    debugPrint("Upload triggered with key: $geminiApiKey");
-    if (geminiApiKey != null && geminiApiKey.isNotEmpty) {
-      _savedGeminiKey = geminiApiKey;
-      _isAirGapped = false;
-    }
+  Future<void> _showImportModal() async {
     
     try {
       PlatformFile? file = await FilePicker.pickFile(type: FileType.custom, allowedExtensions: ['csv']);
@@ -51,7 +66,7 @@ class _MainShellState extends State<MainShell> {
         builder: (c) => ImportProgressDialog(
           fileBytes: bytes,
           fileName: file.name,
-          geminiApiKey: _savedGeminiKey,
+          
           apiService: _apiService,
         )
       );
@@ -104,14 +119,25 @@ class _MainShellState extends State<MainShell> {
         ),
       );
 
-      String aiMode = (_savedGeminiKey != null && _savedGeminiKey!.isNotEmpty) ? "cloud" : "local";
-      final newData = await _apiService.analyzePortfolio(aiMode, _savedGeminiKey, forceRefresh: true);
+      // 1. Fetch fast update without AI
+      final newData = await _apiService.analyzePortfolio("none", forceRefresh: true);
       if (mounted) {
         Navigator.of(context).pop(); // dismiss dialog
+        
+        // 2. Preserve old AI report but mark as stale
+        final oldAiReport = _scanData?['ai_report'];
+        if (oldAiReport != null) {
+          newData['ai_report'] = Map<String, dynamic>.from(oldAiReport);
+          newData['ai_report']['is_stale'] = true;
+        }
+        
         setState(() {
           _scanData = newData;
         });
         ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Market prices updated!'), backgroundColor: Color(0xFF22C55E)));
+        
+        // 3. Trigger background report regeneration
+        _regenerateReport();
       }
     } catch (e) {
       if (mounted) {
@@ -206,18 +232,8 @@ class _MainShellState extends State<MainShell> {
 
                       const Spacer(),
                       // Top Right Status & Actions
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                        decoration: BoxDecoration(color: _isAirGapped ? const Color(0xFF22C55E).withOpacity(0.1) : const Color(0xFFF59E0B).withOpacity(0.1), borderRadius: BorderRadius.circular(16)),
-                        child: Row(
-                          children: [
-                            Icon(Icons.circle, color: _isAirGapped ? const Color(0xFF22C55E) : const Color(0xFFF59E0B), size: 8),
-                            const SizedBox(width: 8),
-                            Text(_isAirGapped ? "Local Air-Gapped Mode" : "Cloud Connection Active", style: TextStyle(color: _isAirGapped ? const Color(0xFF22C55E) : const Color(0xFFF59E0B), fontSize: 12, fontWeight: FontWeight.w600)),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(width: 16),
+                      SerpApiConfigWidget(apiService: _apiService),
+                        const SizedBox(width: 16),
                       ElevatedButton.icon(
                         onPressed: () => _showImportModal(),
                         icon: const Icon(Icons.upload_file, size: 16),
@@ -235,7 +251,9 @@ class _MainShellState extends State<MainShell> {
                     children: [
                       DashboardScreen(
                         scanData: _scanData,
-                        onUploadPressed: (key) => _showImportModal(key),
+                        isRegenerating: _isRegeneratingReport,
+                        onRegenerate: _regenerateReport,
+                        onUploadPressed: () => _showImportModal(),
                         onViewReportPressed: () => setState(() => _selectedIndex = 3),
                         onRefreshPressed: () => _refreshPrices(),
                       ),
@@ -245,7 +263,7 @@ class _MainShellState extends State<MainShell> {
                         onRefreshPressed: () => _refreshPrices()
                       ),
                       PrivacyGateScreen(scanData: _scanData),
-                      ReportsScreen(scanData: _scanData),
+                      ReportsScreen(scanData: _scanData, isRegenerating: _isRegeneratingReport, onRegenerate: _regenerateReport),
                       EvidenceScreen(scanData: _scanData),
                     ],
                   ),

@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 
 class ReportsScreen extends StatelessWidget {
   final Map<String, dynamic>? scanData;
-  const ReportsScreen({super.key, this.scanData});
+  final bool isRegenerating;
+  final VoidCallback? onRegenerate;
+  const ReportsScreen({super.key, this.scanData, this.isRegenerating = false, this.onRegenerate});
 
   @override
   Widget build(BuildContext context) {
@@ -23,11 +25,61 @@ class ReportsScreen extends StatelessWidget {
     final lossContributors = aiReport['loss_contributors'] as List? ?? [];
     final marketContext = aiReport['market_context'] as List? ?? [];
     final risks = aiReport['risks'] as List? ?? [];
-    final strengths = List<String>.from(aiReport['strengths'] ?? []);
-    final concerns = List<String>.from(aiReport['concerns'] ?? []);
+    
+    List<String> parseStringList(dynamic data) {
+      if (data == null) return [];
+      if (data is List) {
+        return data.map((e) {
+          if (e is String) return e;
+          if (e is Map) {
+            if (e.containsKey('description')) return e['description'].toString();
+            if (e.containsKey('reason') && e.containsKey('holding')) return "${e['holding']}: ${e['reason']}";
+            if (e.containsKey('reason')) return e['reason'].toString();
+            if (e.containsKey('text')) return e['text'].toString();
+            if (e.values.isNotEmpty) return e.values.first.toString();
+          }
+          return e.toString();
+        }).toList();
+      }
+      return [];
+    }
+
+    final strengths = parseStringList(aiReport['strengths']);
+    final concerns = parseStringList(aiReport['concerns']);
     final monitorNext = aiReport['monitor_next'] as List? ?? [];
     final priorities = aiReport['research_priorities'] as List? ?? [];
-    final investorQuestions = List<String>.from(aiReport['investor_questions'] ?? []);
+    final investorQuestions = parseStringList(aiReport['investor_questions']);
+
+    if (isRegenerating) {
+      return const Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            CircularProgressIndicator(color: Color(0xFF4F46E5)),
+            SizedBox(height: 16),
+            Text("Regenerating AI Analysis...", style: TextStyle(color: Color(0xFFA1A1AA))),
+          ],
+        ),
+      );
+    }
+    if (aiReport['is_stale'] == true) {
+      return Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Icon(Icons.warning_amber_rounded, color: Color(0xFFF59E0B), size: 48),
+            const SizedBox(height: 16),
+            const Text("Report is stale (Prices updated)", style: TextStyle(color: Color(0xFFA1A1AA))),
+            const SizedBox(height: 16),
+            ElevatedButton(
+              onPressed: onRegenerate,
+              style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF4F46E5)),
+              child: const Text("Regenerate Now", style: TextStyle(color: Colors.white)),
+            )
+          ],
+        ),
+      );
+    }
 
     return SingleChildScrollView(
       padding: const EdgeInsets.all(32.0),

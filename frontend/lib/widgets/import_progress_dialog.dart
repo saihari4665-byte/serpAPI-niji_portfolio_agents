@@ -5,14 +5,12 @@ import '../services/api_service.dart';
 class ImportProgressDialog extends StatefulWidget {
   final Uint8List fileBytes;
   final String fileName;
-  final String? geminiApiKey;
   final ApiService apiService;
 
   const ImportProgressDialog({
     super.key,
     required this.fileBytes,
     required this.fileName,
-    this.geminiApiKey,
     required this.apiService,
   });
 
@@ -45,10 +43,7 @@ class _ImportProgressDialogState extends State<ImportProgressDialog> {
       var initialData = await widget.apiService.scanPortfolio();
       
       setState(() { _progress = 85; _status = "Running local AI analysis..."; });
-      var finalData = await widget.apiService.analyzePortfolio(
-        widget.geminiApiKey != null && widget.geminiApiKey!.isNotEmpty ? "cloud" : "local",
-        widget.geminiApiKey
-      );
+      var finalData = await widget.apiService.analyzePortfolio("local");
       
       setState(() {
         _progress = 100;

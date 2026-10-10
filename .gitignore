@@ -17,3 +17,22 @@ data/latest_portfolio.csv
 # Flutter build outputs
 frontend/build/
 frontend/.dart_tool/
+data/.serpapi_config
+
+# Packaging outputs
+dist/
+build/
+
+
+# Temporary test and build output
+test_dist/
+test.csv
+
+# Temporary notes and patch scripts
+backend/main.py.txt
+backend/serpapi_client.txt
+frontend/dashboard.txt
+frontend/main_shell.txt
+frontend/patch_imports.py
+frontend/settings.txt
+frontend/settings_view.txt

@@ -36,13 +36,37 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-DATA_DIR = os.path.join(os.path.dirname(__file__), "..", "data")
+_appdata = os.environ.get("APPDATA", os.path.join(os.path.expanduser("~"), "AppData", "Roaming"))
+DATA_DIR = os.path.join(_appdata, "NijiLocal", "data")
+os.makedirs(DATA_DIR, exist_ok=True)
 LATEST_PORTFOLIO_PATH = os.path.join(DATA_DIR, "latest_portfolio.csv")
 
 def get_current_dataframe() -> pd.DataFrame:
     if os.path.exists(LATEST_PORTFOLIO_PATH):
         return pd.read_csv(LATEST_PORTFOLIO_PATH)
     raise HTTPException(status_code=400, detail="No portfolio data uploaded yet.")
+
+from pydantic import BaseModel
+from serpapi_service import validate_and_save_key, clear_serpapi_key, get_serpapi_status
+
+class SerpApiKey(BaseModel):
+    api_key: str
+
+@app.get("/api/settings/serpapi/status")
+async def serpapi_status():
+    return get_serpapi_status()
+
+@app.post("/api/settings/serpapi/save")
+async def serpapi_save(payload: SerpApiKey):
+    res = validate_and_save_key(payload.api_key)
+    if not res.get("success"):
+        raise HTTPException(status_code=400, detail=res.get("error"))
+    return {"status": "Connected"}
+
+@app.post("/api/settings/serpapi/clear")
+async def serpapi_clear():
+    clear_serpapi_key()
+    return {"status": "Cleared"}
 
 @app.post("/api/portfolio/upload")
 async def upload_portfolio(file: UploadFile = File(...)):
@@ -91,7 +115,6 @@ async def privacy_check(file: UploadFile = File(None)):
 @app.post("/api/portfolio/analyze")
 async def analyze_portfolio(
     file: UploadFile = File(None),
-    gemini_api_key: str = Form(None),
     ai_mode: str = Form("local"),
     force_refresh: str = Form("false")
 ):
@@ -211,8 +234,7 @@ async def analyze_portfolio(
 
     health_data = calculate_health_score(weights["holdings"], current_value)
 
-    active_ai_mode = "cloud" if (gemini_api_key and gemini_api_key.strip() != "") else ai_mode
-    rich_analysis = run_rich_analysis(weights, market_data, active_ai_mode, gemini_api_key)
+    rich_analysis = run_rich_analysis(weights, market_data, ai_mode)
 
     audit_log = [
         {

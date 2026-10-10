@@ -35,7 +35,7 @@ def calculate_portfolio_weights(df: pd.DataFrame) -> dict:
                 return col_map[clean_alias]
         return None
 
-    sym_col = get_col(["instrument", "stockname", "company", "companyname", "name", "symbolname", "ticker", "symbol", "tradingsymbol", "tickersymbol"]) or original_cols[0]
+    sym_col = get_col(["ticker", "symbol", "tradingsymbol", "tickersymbol", "instrument", "stockname", "company", "companyname", "name", "symbolname"]) or original_cols[0]
     qty_col = get_col(["qty", "quantity", "units", "shares", "noofshares"])
     buy_price_col = get_col(["avgprice", "averageprice", "averagebuyprice", "buyprice", "avgcost", "averagecost"])
     current_price_col = get_col(["ltp", "currentprice", "cmp", "marketprice", "lasttradedprice", "closeprice"])
@@ -182,7 +182,7 @@ def calculate_health_score(holdings: dict, total_value: float) -> dict:
         "sector_allocation": sector_allocation
     }
 
-def analyze_portfolio_risk(weights: dict, market_data: dict, ai_mode: str = "local", gemini_api_key: str = None) -> str:
+def analyze_portfolio_risk(weights: dict, market_data: dict, ai_mode: str = "local") -> str:
     prompt = (
         "You are an expert AI financial analyst. Assess the risk of the following stock portfolio.\n"
         "IMPORTANT RULES:\n"
@@ -246,25 +246,10 @@ def analyze_portfolio_risk(weights: dict, market_data: dict, ai_mode: str = "loc
     prompt += "}\n\n"
     prompt += "IMPORTANT: Ground all statements in the deterministic metrics provided. Do not hallucinate prices, and do not falsely claim causation from news without saying 'could have influenced' or 'likely contributor'. If no news, explicitly state it."
 
-    if ai_mode == "cloud" and gemini_api_key:
-        try:
-            from google import genai
-            client = genai.Client(api_key=gemini_api_key)
-            response = client.models.generate_content(
-                model='gemini-2.5-flash',
-                contents=prompt
-            )
-            return response.text
-        except Exception:
-            try:
-                import google.generativeai as legacy_genai
-                legacy_genai.configure(api_key=gemini_api_key)
-                model = legacy_genai.GenerativeModel('gemini-1.5-flash')
-                return model.generate_content(prompt).text
-            except Exception as e:
-                return f"Error connecting to Gemini API:\n\n{str(e)}\n\nPlease verify your API key."
-    else:
-        return call_local_llm(prompt)
+    if ai_mode == "none":
+        return "{}"
+    
+    return call_local_llm(prompt)
 
 def call_local_llm(prompt: str) -> str:
     base_url = os.getenv("OLLAMA_BASE_URL", "http://localhost:11434/v1")
@@ -286,13 +271,14 @@ def call_local_llm(prompt: str) -> str:
         return (
             f"### Local AI Offline Notice\n"
             f"Could not connect to Ollama model `{model_name}` at `{base_url}`.\n\n"
-            f"**To test during evaluation:** Paste your Gemini API key in the import box to run cloud inference instantly."
+            f"**Error:** {str(e)}\n\n"
+            f"Please ensure Ollama is running and the model is downloaded."
         )
 
 import json
 
-def run_rich_analysis(weights: dict, market_data: dict, ai_mode: str = "local", gemini_api_key: str = None) -> dict:
-    llm_output = analyze_portfolio_risk(weights, market_data, ai_mode, gemini_api_key)
+def run_rich_analysis(weights: dict, market_data: dict, ai_mode: str = "local") -> dict:
+    llm_output = analyze_portfolio_risk(weights, market_data, ai_mode)
     
     # Try parsing the LLM output as JSON
     parsed_ai = None
