@@ -5,6 +5,37 @@ A privacy-first Windows desktop application for Indian stock portfolio analysis,
 Niji LOCAL combines a Flutter desktop frontend, a FastAPI backend, local AI analysis, and SerpApi-powered public market research to help users understand portfolio performance, identify potential risks, and explore relevant market information.
 
 ---
+## 🧑‍⚖️ For Hackathon Judges — Try Niji LOCAL
+
+Thank you for evaluating **Niji LOCAL**, our privacy-first AI-powered portfolio intelligence desktop application built for Indian stock market investors.
+
+### 📥 Download and Install
+
+**[Download Niji LOCAL v1 for Windows](https://github.com/saiharish4665-byte/serpAPI-niji_portfolio_agents/releases/tag/v1)**
+
+1. Open the release page above.
+2. Download `NijiLocal_Setup.exe`.
+3. Run the installer and follow the installation instructions.
+
+### ⚙️ Requirements
+
+- **Operating system:** Windows 10/11 (64-bit).
+- **Local AI:** Install [Ollama](https://ollama.com/) and run `ollama pull gemma2:2b` to download the Gemma 2 2B model.
+- **Live market data:** Configure a valid [SerpApi API key](https://serpapi.com/) in the application.
+
+### 🔍 What to Explore
+
+- Portfolio dashboard and investment performance.
+- Live market-price updates.
+- AI-powered portfolio analysis and risk insights.
+- Sector allocation and portfolio concentration.
+- Investor intelligence reports powered by local AI.
+
+### 🔐 Privacy
+
+Niji LOCAL is designed to keep sensitive portfolio information on your device while using local AI for analysis. SerpApi is used to retrieve public market information. Please use a sample portfolio when evaluating the application.
+
+**Thank you for your time and consideration!** We welcome your feedback.
 
 ## 1. System Requirements
 
