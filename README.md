@@ -5,13 +5,14 @@ A privacy-first Windows desktop application for Indian stock portfolio analysis,
 Niji LOCAL combines a Flutter desktop frontend, a FastAPI backend, local AI analysis, and SerpApi-powered public market research to help users understand portfolio performance, identify potential risks, and explore relevant market information.
 
 ---
+
 ## 🧑‍⚖️ For Hackathon Judges — Try Niji LOCAL
 
 Thank you for evaluating **Niji LOCAL**, our privacy-first AI-powered portfolio intelligence desktop application built for stock market investors.
 
 ### 📥 Download and Install
 
-**[Download Niji LOCAL v1 for Windows](https://github.com/saihari4665-byte/serpAPI-niji_portfolio_agents/releases/tag/v1)** 
+[**Download Niji LOCAL v1 for Windows**](https://github.com/saihari4665-byte/serpAPI-niji_portfolio_agents/releases/tag/v1)
 
 1. Open the release page above.
 2. Download `NijiLocal_Setup.exe`.
@@ -30,6 +31,20 @@ Thank you for evaluating **Niji LOCAL**, our privacy-first AI-powered portfolio 
 - AI-powered portfolio analysis and risk insights.
 - Sector allocation and portfolio concentration.
 - Investor intelligence reports powered by local AI.
+
+### 🧪 Try with Sample Portfolios
+
+You can test Niji LOCAL without importing your personal financial data. Sample CSV files are available in the repository's [`data/` folder](https://github.com/saiharish4665-byte/serpAPI-niji_portfolio_agents/tree/main/data):
+
+- [`portfolio_sample.csv`](https://github.com/saiharish4665-byte/serpAPI-niji_portfolio_agents/blob/main/data/portfolio_sample.csv) — General sample portfolio.
+- [`kite_holdings_sample.csv`](https://github.com/saiharish4665-byte/serpAPI-niji_portfolio_agents/blob/main/data/kite_holdings_sample.csv) — Sample Kite holdings.
+- [`kite_fresh_holdings_sample.csv`](https://github.com/saiharish4665-byte/serpAPI-niji_portfolio_agents/blob/main/data/kite_fresh_holdings_sample.csv) — Fresh holdings dataset.
+- [`kite_diversified.csv`](https://github.com/saiharish4665-byte/serpAPI-niji_portfolio_agents/blob/main/data/kite_diversified.csv) — Diversified portfolio example.
+- [`kite_concentrated.csv`](https://github.com/saiharish4665-byte/serpAPI-niji_portfolio_agents/blob/main/data/kite_concentrated.csv) — Concentrated portfolio example.
+- [`kite_edge_cases.csv`](https://github.com/saiharish4665-byte/serpAPI-niji_portfolio_agents/blob/main/data/kite_edge_cases.csv) — Edge cases for testing CSV handling.
+- [`fresh_portfolio_kpit_vbl_wipro_etc.csv`](https://github.com/saiharish4665-byte/serpAPI-niji_portfolio_agents/blob/main/data/fresh_portfolio_kpit_vbl_wipro_etc.csv) — Sample portfolio featuring KPIT, VBL, WIPRO, and other stocks.
+
+**How to use:** Open a CSV link, download the file, then import it through Niji LOCAL's portfolio import feature. Use these samples for evaluation rather than your personal financial data. CSV compatibility depends on the format supported by the current app version.
 
 ### 🔐 Privacy
 
@@ -130,15 +145,15 @@ Download `NijiLocal_Setup.exe` from the project's trusted release or distributio
 
 ## 4. Technology Stack
 
-| Component | Technology |
-|---|---|
-| Desktop frontend | Flutter and Dart |
-| Backend API | Python and FastAPI |
-| Local AI inference | Ollama with the configured model |
-| Public market research | SerpApi |
-| Portfolio data | CSV and local persistence, where implemented |
-| Windows backend packaging | PyInstaller |
-| Windows installer | Inno Setup |
+| **Component**             | **Technology**                               |
+| ------------------------- | -------------------------------------------- |
+| Desktop frontend          | Flutter and Dart                             |
+| Backend API               | Python and FastAPI                           |
+| Local AI inference        | Ollama with the configured model             |
+| Public market research    | SerpApi                                      |
+| Portfolio data            | CSV and local persistence, where implemented |
+| Windows backend packaging | PyInstaller                                  |
+| Windows installer         | Inno Setup                                   |
 
 ---
 
@@ -154,7 +169,7 @@ Niji LOCAL separates the desktop interface, backend processing, local AI, and pu
 
 ### Data flow
 
-```text
+```
 User
   |
   v
@@ -174,6 +189,7 @@ FastAPI Backend
   |
   v
 Portfolio Insights and Reports
+
 ```
 
 The diagram represents the intended architecture; exact processing paths depend on the implemented endpoints and services.
@@ -226,7 +242,7 @@ This section is intended for developers who want to modify or rebuild Niji LOCAL
 
 ### Step 1: Clone the repository
 
-```bash
+```
 git clone <YOUR_GITHUB_REPOSITORY_URL>
 cd serp_api_proj
 ```
@@ -235,7 +251,7 @@ Replace the placeholder with the actual public repository URL.
 
 ### Step 2: Set up the Python backend
 
-```powershell
+```
 cd backend
 python -m venv .venv
 .\.venv\Scripts\Activate.ps1
@@ -255,7 +271,7 @@ Do not commit `.env` files or real API keys.
 
 If the backend entry point is `main.py` and the FastAPI application object is named `app`, the development command is:
 
-```powershell
+```
 uvicorn main:app --reload
 ```
 
@@ -265,7 +281,7 @@ Run the command from the backend directory. Confirm the actual application entry
 
 Open another terminal:
 
-```powershell
+```
 cd frontend
 flutter pub get
 flutter build windows --release
@@ -273,8 +289,9 @@ flutter build windows --release
 
 The Windows release executable is typically generated under:
 
-```text
+```
 frontend/build/windows/x64/runner/Release/
+
 ```
 
 ### Step 6: Package the backend
@@ -293,7 +310,7 @@ Compile the installer and test it on a Windows environment separate from the dev
 
 ## 9. Project Structure
 
-```text
+```
 serp_api_proj/
 ├── backend/
 │   ├── main.py
@@ -315,6 +332,7 @@ serp_api_proj/
 ├── setup.iss
 ├── .gitignore
 └── README.md
+
 ```
 
 This is a high-level overview. Actual files may differ depending on the current branch and packaging configuration.
@@ -368,4 +386,4 @@ Market information may be delayed, incomplete, or inaccurate. Verify important i
 
 ## 12. License
 
-No open-source license has been specified for this repository yet. Unless a license is added, the project remains under its default copyright protections. Do not assume that others have permission to redistribute or modify it.
+No open-source license has been specified for this repository yet. Unless a license is added, the project remains 
