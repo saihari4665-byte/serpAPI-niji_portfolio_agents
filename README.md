@@ -11,9 +11,9 @@ Thank you for evaluating **Niji LOCAL**, our privacy-first AI-powered portfolio 
 
 ### 📥 Download and Install
 
-**[Download Niji LOCAL v1 for Windows](https://github.com/saihari4665-byte/serpAPI-niji_portfolio_agents/releases/tag/v1)** (also inside Git Release)
+**[Download Niji LOCAL v1 for Windows](https://github.com/saihari4665-byte/serpAPI-niji_portfolio_agents/releases/tag/v1)** 
 
-1. Open the release page above(Inside Git Release ).
+1. Open the release page above.
 2. Download `NijiLocal_Setup.exe`.
 3. Run the installer and follow the installation instructions.
 
