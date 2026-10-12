@@ -7,13 +7,13 @@ Niji LOCAL combines a Flutter desktop frontend, a FastAPI backend, local AI anal
 ---
 ## 🧑‍⚖️ For Hackathon Judges — Try Niji LOCAL
 
-Thank you for evaluating **Niji LOCAL**, our privacy-first AI-powered portfolio intelligence desktop application built for Indian stock market investors.
+Thank you for evaluating **Niji LOCAL**, our privacy-first AI-powered portfolio intelligence desktop application built for stock market investors.
 
 ### 📥 Download and Install
 
-**[Download Niji LOCAL v1 for Windows](https://github.com/saiharish4665-byte/serpAPI-niji_portfolio_agents/releases/tag/v1)**
+**[Download Niji LOCAL v1 for Windows](https://github.com/saihari4665-byte/serpAPI-niji_portfolio_agents/releases/tag/v1)** (also inside Git Release)
 
-1. Open the release page above.
+1. Open the release page above(Inside Git Release ).
 2. Download `NijiLocal_Setup.exe`.
 3. Run the installer and follow the installation instructions.
 
